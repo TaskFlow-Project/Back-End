@@ -1,4 +1,4 @@
-const { isProjectManager } = require("../Models/Role");
+const { isProjectManager } = require('../Models/Role');
 
 const checkProjectManager = async (req, res, next) => {
   const userId = req.user.id; // L'ID extrait du token
@@ -8,7 +8,7 @@ const checkProjectManager = async (req, res, next) => {
   if (!isAllowed) {
     return res
       .status(403)
-      .json({ message: "Vous ne pouvez pas ajouter de tâche à ce projet." });
+      .json({ message: 'Vous ne pouvez pas ajouter de tâche à ce projet.' });
   }
   next();
 };

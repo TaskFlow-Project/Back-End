@@ -1,30 +1,30 @@
 // INSCRIPTION
+const jwt = require('jsonwebtoken');
 const {
   hashPassword,
   comparePassword,
   findUserById,
   findUserByEmail,
   createUser,
-} = require("../Models/User");
-
-const jwt = require("jsonwebtoken");
+} = require('../Models/User');
 
 // Fonction de validation du mot de passe
 const validatePassword = (password) => {
-  const passwordRegex =
-    /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,20}$/;
+  const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,20}$/;
   return passwordRegex.test(password);
 };
 
 const register = async (req, res) => {
   try {
-    const { Nom, Prenom, email, Mot_de_passe } = req.body;
+    const {
+      Nom, Prenom, email, Mot_de_passe,
+    } = req.body;
 
     // Verifier si l'Email existe déjà
     const existingUser = await findUserByEmail(email);
     if (existingUser.length > 0) {
       return res.status(400).json({
-        message: "Erreur : Cet Email est déjà utilisé",
+        message: 'Erreur : Cet Email est déjà utilisé',
       });
     }
 
@@ -32,7 +32,7 @@ const register = async (req, res) => {
     if (!validatePassword(Mot_de_passe)) {
       return res.status(400).json({
         message:
-          "Le mot de passe doit contenir entre 8 et 20 caractères, incluant au moins une lettre majuscule, une lettre minuscule, un chiffre et un caractère spécial.",
+          'Le mot de passe doit contenir entre 8 et 20 caractères, incluant au moins une lettre majuscule, une lettre minuscule, un chiffre et un caractère spécial.',
       });
     }
 
@@ -48,12 +48,12 @@ const register = async (req, res) => {
     });
 
     res.status(201).json({
-      message: "Votre inscription a bien été validé ",
-      client_id: result.insertId,
+      message: 'Votre inscription a bien été validé ',
+      user_id: result.insertId,
       user: { Nom, Prenom, email },
     });
   } catch (error) {
-    console.error("Erreur inscription", error.message);
+    console.error('Erreur inscription', error.message);
     res.status(500).json({
       message: "Erreur lors de l'inscription",
     });
@@ -61,7 +61,6 @@ const register = async (req, res) => {
 };
 
 // Connexion
-
 const login = async (req, res) => {
   try {
     const { email, Mot_de_passe } = req.body;
@@ -71,7 +70,7 @@ const login = async (req, res) => {
     const users = await findUserByEmail(email);
     if (users.length === 0) {
       return res.status(401).json({
-        message: "Identifiants incorrects",
+        message: 'Identifiants incorrects',
       });
     }
 
@@ -83,13 +82,13 @@ const login = async (req, res) => {
 
     if (!isMatch) {
       return res.status(41).json({
-        message: "Identifiants incorrects",
+        message: 'Identifiants incorrects',
       });
     }
 
     // GÉNÉRER LE TOKEN JWT
     // Expire en secondes
-    const expireValeur = process.env.JWT_EXPIRES_IN || "3600";
+    const expireValeur = process.env.JWT_EXPIRES_IN || '3600';
     const expire = parseInt(expireValeur, 10);
     const token = jwt.sign(
       { id: user.id_user, email: user.user_email },
@@ -98,14 +97,14 @@ const login = async (req, res) => {
     );
 
     // On place le token dans un cookie HttpOnly
-    res.cookie("token", token, {
+    res.cookie('token', token, {
       httpOnly: true,
       secure: false, // mettre sur vrai pour mise en ligne
-      sameSite: "none",
+      sameSite: 'none',
       maxAge: expire * 1000,
     });
     res.json({
-      message: "Connexion réussie",
+      message: 'Connexion réussie',
       token,
       user: {
         id: user.id_user,
@@ -115,21 +114,21 @@ const login = async (req, res) => {
       },
     });
   } catch (error) {
-    console.error("Erreur de connexion utilisateur", error.message);
+    console.error('Erreur de connexion utilisateur', error.message);
     res.status(500).json({
-      message: "Erreur lors de la connexion",
+      message: 'Erreur lors de la connexion',
     });
   }
 };
 
 // Fonction qui permet le logout
 const logout = (req, res) => {
-  res.clearCookie("token", {
+  res.clearCookie('token', {
     httpOnly: true,
     secure: false, // mettre sur vrai en Https (c'est a dire en ligne)
-    sameSite: "none",
+    sameSite: 'none',
   });
-  res.json({ message: "Déconnexion réussie" });
+  res.json({ message: 'Déconnexion réussie' });
 };
 
 // Automatiquement le navigateur envoie le cookie
@@ -141,7 +140,7 @@ const getMe = async (req, res) => {
     const users = await findUserById(req.user.id);
 
     if (users.length === 0) {
-      return res.status(404).json({ message: "Utilisateur introuvable" });
+      return res.status(404).json({ message: 'Utilisateur introuvable' });
     }
 
     const user = users[0];
@@ -155,11 +154,13 @@ const getMe = async (req, res) => {
       },
     });
   } catch (error) {
-    console.error("Erreur /me:", error.message);
+    console.error('Erreur /me:', error.message);
     res
       .status(500)
-      .json({ message: "Erreur lors de la vérification de session" });
+      .json({ message: 'Erreur lors de la vérification de session' });
   }
 };
 
-module.exports = { register, login, logout, getMe };
+module.exports = {
+  register, login, logout, getMe,
+};

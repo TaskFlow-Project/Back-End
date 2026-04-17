@@ -1,8 +1,8 @@
 // Permet de config le pool de connexion à MySQL
 // Pour faire des requêtes asynchrones/await
 
-const mysql = require("mysql2/promise");
-require("dotenv").config();
+const mysql = require('mysql2/promise');
+require('dotenv').config();
 
 // Pool de connexion qui permet de gérer plusieurs connexions simultanées, réutiliser des connexions existantes
 // Permet aussi une gestion auto de la disponibilité et limiter le nb de connexions (en même temps)
@@ -24,18 +24,18 @@ const db = mysql.createPool({
   enableKeepAlive: true,
   keepAliveInitialDelay: 0,
   // 2. Timeout de connexion (milliseconde)
-  connectTimeout: 10000, //10sec
+  connectTimeout: 10000, // 10sec
 });
 
 (async () => {
   try {
     const connection = await db.getConnection();
-    console.log("Connecté à la base de données MySQL");
+    console.log('Connecté à la base de données MySQL');
 
     // Se déconnecte
     connection.release();
   } catch (err) {
-    console.error("Erreur de connexion à MySQL : ", err.message);
+    console.error('Erreur de connexion à MySQL : ', err.message);
     // Arrete l'application avec un code erreur
     process.exit(1);
   }

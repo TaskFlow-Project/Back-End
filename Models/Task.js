@@ -1,7 +1,7 @@
-//MODEL TACHES
+// MODEL TACHES
 const db = require("../db");
 
-//fonction pour créer une tâche
+// fonction pour créer une tâche
 const createTask = async (taskData) => {
   const {
     title,
@@ -15,14 +15,14 @@ const createTask = async (taskData) => {
   } = taskData;
 
   const [result] = await db.query(
-    "INSERT INTO tâches (task_title, task_desc, task_pos, task_due_date, planned_time, reel_time, id_col, id_project) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+    "INSERT INTO taches (task_title, task_desc, task_pos, task_due_date, planned_time, reel_time, id_col, id_project) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
     [title, description, pos, due_date, planned, reel, col_id, project_id],
   );
 
   return result; // On retourne l'objet de la tâche qui vient d'être créée
 };
 
-//fonction qui permet de mettre à jour une tâche
+// fonction qui permet de mettre à jour une tâche
 const updateTask = async (idData, taskData) => {
   const fields = [];
   const values = [];
@@ -52,30 +52,30 @@ const updateTask = async (idData, taskData) => {
 
   values.push(idData); // Ajouter l'ID de la tâche pour la clause WHERE
 
-  const sql = `UPDATE tâches SET ${fields.join(", ")} WHERE id_task = ?`;
+  const sql = `UPDATE taches SET ${fields.join(", ")} WHERE id_task = ?`;
 
   const [result] = await db.query(sql, values);
   return result;
 };
 
-//fonction qui permet de recuperer toutes les tâches
+// fonction qui permet de recuperer toutes les tâches
 
 const getAllTasks = async () => {
-  const [rows] = await db.query("SELECT * FROM tâches");
+  const [rows] = await db.query("SELECT * FROM taskflow.taches");
   return rows;
 };
 
-//récupérer une tâche par son ID
+// récupérer une tâche par son ID
 const getTaskByID = async (id) => {
-  const [result] = await db.query("SELECT * FROM tâches WHERE id_task = ?", [
+  const [result] = await db.query("SELECT * FROM taches WHERE id_task = ?", [
     id,
   ]);
   return result;
 };
 
-//pour supprimer une tâche
+// pour supprimer une tâche
 const delTask = async (id) => {
-  const [result] = await db.query("DELETE FROM tâches WHERE id_task = ?", [id]);
+  const [result] = await db.query("DELETE FROM taches WHERE id_task = ?", [id]);
   return result;
 };
 

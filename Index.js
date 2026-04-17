@@ -4,8 +4,8 @@ const morgan = require("morgan");
 require("dotenv").config(); // permet de charger les var d'env depuis .env
 const cookieParser = require("cookie-parser");
 
-const authRoutes = require("./Endpoints/authRoutes"); // Vérifie bien le chemin du dossier
-const taskRoutes = require("./Endpoints/taskRoutes"); // On suppose que c'est le nom du fichier
+const authRoutes = require("./Endpoints/authRoutes");
+const taskRoutes = require("./Endpoints/taskRoutes");
 
 // Connx a la BDD
 const db = require("./db");

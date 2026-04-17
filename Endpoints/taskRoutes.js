@@ -1,21 +1,21 @@
 // ROUTER Tâches
-//Chemin : /api/tâches
+// Chemin : /api/tâches
 
-const express = require("express");
-const { getAll, getByID, create } = require("../controllers/taskController");
-const { verifyToken } = require("../Middleware/authMiddleware");
-const { checkProjectManager } = require("../Middleware/checkProjectManager");
+const express = require('express');
+const { getAll, getByID, create } = require('../controllers/taskController');
+const { verifyToken } = require('../Middleware/authMiddleware');
+const { checkProjectManager } = require('../Middleware/checkProjectManager');
 
 const router = express.Router();
 
-router.post("/", verifyToken, checkProjectManager, create);
+router.post('/', verifyToken, checkProjectManager, create);
 
-//GET /api/tâches - Récupérer toutes les tâches
+// GET /api/tâches - Récupérer toutes les tâches
 
-router.get("/", verifyToken, getAll);
+router.get('/', verifyToken, getAll);
 
-//GET /api/tâches/:id récupérer une tâche par son ID
+// GET /api/tâches/:id récupérer une tâche par son ID
 
-router.get("/:id", verifyToken, getByID);
+router.get('/:id', verifyToken, getByID);
 
 module.exports = router;
