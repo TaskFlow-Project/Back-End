@@ -1,4 +1,4 @@
-//INSCRIPTION
+// INSCRIPTION
 const {
   hashPassword,
   comparePassword,
@@ -9,11 +9,18 @@ const {
 
 const jwt = require("jsonwebtoken");
 
+// Fonction de validation du mot de passe
+const validatePassword = (password) => {
+  const passwordRegex =
+    /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,20}$/;
+  return passwordRegex.test(password);
+};
+
 const register = async (req, res) => {
   try {
     const { Nom, Prenom, email, Mot_de_passe } = req.body;
 
-    //Verifier si l'Email existe déjà
+    // Verifier si l'Email existe déjà
     const existingUser = await findUserByEmail(email);
     if (existingUser.length > 0) {
       return res.status(400).json({
@@ -21,10 +28,18 @@ const register = async (req, res) => {
       });
     }
 
-    //Hashage du MDP
+    // Valider le mot de passe
+    if (!validatePassword(Mot_de_passe)) {
+      return res.status(400).json({
+        message:
+          "Le mot de passe doit contenir entre 8 et 20 caractères, incluant au moins une lettre majuscule, une lettre minuscule, un chiffre et un caractère spécial.",
+      });
+    }
+
+    // Hashage du MDP
     const hash = await hashPassword(Mot_de_passe);
 
-    //Créer le client
+    // Créer le client
     const result = await createUser({
       Nom,
       Prenom,
@@ -45,13 +60,13 @@ const register = async (req, res) => {
   }
 };
 
-//Connexion
+// Connexion
 
 const login = async (req, res) => {
   try {
     const { email, Mot_de_passe } = req.body;
 
-    //Rechercher le client
+    // Rechercher le client
 
     const users = await findUserByEmail(email);
     if (users.length === 0) {
@@ -62,18 +77,18 @@ const login = async (req, res) => {
 
     const user = users[0];
 
-    //Vérifier le MDP
+    // Vérifier le MDP
 
     const isMatch = await comparePassword(Mot_de_passe, user.user_password);
 
     if (!isMatch) {
-      return res.status(401).json({
+      return res.status(41).json({
         message: "Identifiants incorrects",
       });
     }
 
-    //GÉNÉRER LE TOKEN JWT
-    // expire en secondes
+    // GÉNÉRER LE TOKEN JWT
+    // Expire en secondes
     const expireValeur = process.env.JWT_EXPIRES_IN || "3600";
     const expire = parseInt(expireValeur, 10);
     const token = jwt.sign(
@@ -82,10 +97,10 @@ const login = async (req, res) => {
       { expiresIn: expire },
     );
 
-    //On place le token dans un cookie HttpOnly
+    // On place le token dans un cookie HttpOnly
     res.cookie("token", token, {
       httpOnly: true,
-      secure: false, // mettre sur vrai en Https (c'est a dire en ligne)
+      secure: false, // mettre sur vrai pour mise en ligne
       sameSite: "none",
       maxAge: expire * 1000,
     });
@@ -107,7 +122,7 @@ const login = async (req, res) => {
   }
 };
 
-//fonction qui permet le logout
+// Fonction qui permet le logout
 const logout = (req, res) => {
   res.clearCookie("token", {
     httpOnly: true,
@@ -117,9 +132,9 @@ const logout = (req, res) => {
   res.json({ message: "Déconnexion réussie" });
 };
 
-//Automatiquement le navigateur envoie le cookie
-//le middleware verifie le JWT
-//SI le token EST valide, On retourne les infos de l'utilisateur
+// Automatiquement le navigateur envoie le cookie
+// Le middleware verifie le JWT
+// SI le token EST valide, On retourne les infos de l'utilisateur
 const getMe = async (req, res) => {
   try {
     // req.user.id vient du JWT decode par le middleware verifyToken

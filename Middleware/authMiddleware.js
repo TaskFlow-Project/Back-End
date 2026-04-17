@@ -1,6 +1,7 @@
 //Middleware d'authenfication JWT - authMiddleware.js
 //Vérifie que le token JWT est valide pour proteger les routes
 const jwt = require("jsonwebtoken");
+const { isProjectManager } = require("../Models/Role");
 
 const verifyToken = (req, res, next) => {
   // Cherche le token dans le cookie HttpOnly
@@ -36,7 +37,7 @@ const verifyToken = (req, res, next) => {
       });
     }
 
-    //Token valide : on ajoute les infos du client à la requête
+    //Token valide : on ajoute les infos de l'utilisateur à la requête
 
     req.user = decoded;
     next();
