@@ -1,7 +1,9 @@
+require("dotenv").config(); // permet de charger les var d'env depuis .env
+console.log("ENV TEST:", process.env.DB_USER, process.env.DB_HOST);
 const express = require("express");
 const cors = require("cors");
 const morgan = require("morgan");
-require("dotenv").config(); // permet de charger les var d'env depuis .env
+
 const cookieParser = require("cookie-parser");
 
 //connx a la BDD
