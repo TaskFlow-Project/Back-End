@@ -51,9 +51,7 @@ app.get("/health", (req, res) => {
 
 // Routes de l'API
 app.use("/api/users", authRoutes);
-app.use("/api/taches", taskRoutes); // On évite l'accent pour être plus "safe"
-app.use("/api", projectRoutes);
-app.use("/api", columnRoutes);
+app.use("/api/taches", taskRoutes);
 
 // Gestion des erreurs
 
