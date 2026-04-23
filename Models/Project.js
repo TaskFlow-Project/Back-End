@@ -1,27 +1,36 @@
 const db = require("../db");
 
-// Crée un nouveau projet dans la base de données
-const createProject = async (project_name, project_desc) => {
-  let connection;
+// Crée un nouveau projet et assigne le créateur comme Chef de projet
+const createProject = async (project_name, project_desc, userId) => {
+  const connection = await db.getConnection();
   try {
-    connection = await db.getConnection();
     await connection.beginTransaction();
 
-    const [result] = await connection.execute(
+    // 1. Insérer le nouveau projet
+    const [projectResult] = await connection.execute(
       "INSERT INTO projets (project_name, project_desc) VALUES (?, ?)",
       [project_name, project_desc],
     );
+    const projectId = projectResult.insertId;
 
-    const projectId = result.insertId;
+    // 2. Récupérer l'ID du rôle "Chef de projet" (supposons que son ID est 1)
+    // Pour plus de robustesse, on pourrait le chercher par son nom.
+    const chefDeProjetRoleId = 1; 
+
+    // 3. Lier l'utilisateur au projet avec le rôle de Chef de projet
+    await connection.execute(
+      "INSERT INTO participer (id_user, id_project, id_role) VALUES (?, ?, ?)",
+      [userId, projectId, chefDeProjetRoleId],
+    );
 
     await connection.commit();
     return projectId;
   } catch (error) {
-    if (connection) await connection.rollback();
+    await connection.rollback();
     console.error("ERREUR SQL DÉTAILLÉE DANS CREATEPROJECT:", error.message);
     throw error;
   } finally {
-    if (connection) connection.release();
+    connection.release();
   }
 };
 

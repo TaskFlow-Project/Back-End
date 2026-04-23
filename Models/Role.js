@@ -11,8 +11,8 @@ const sql = `
 // Les paramètres à envoyer à db.execute()
 
 const isProjectManager = async (userId, projectId) => {
-  // On utilise la variable 'sql' définie plus haut qui contient le JOIN
-  const [rows] = await db.query(sql, [userId, projectId, "Chef de projet"]);
+  // On vérifie si l'utilisateur est "admin" pour ce projet
+  const [rows] = await db.query(sql, [userId, projectId, "admin"]);
 
   return rows.length > 0;
 };

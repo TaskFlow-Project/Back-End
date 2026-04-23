@@ -4,17 +4,22 @@ const {
   getTaskByID,
   createTask,
   updateTaskStatusInDB,
+  getTasksByProjectId,
 } = require("../Models/Task");
+const { getProjectById } = require("../Models/Project"); // Importer la fonction du modèle Projet
 const { isProjectManager } = require("../Models/Role");
 
 // LE MODÈLE ENVOIE DES DONNEES ICI ET LE CONTROLLER LES ENVOIENT A L'UTILISATEUR
 // Créer une tâche
 const create = async (req, res) => {
+  console.log('--- Création de tâche ---');
+  console.log('Payload reçu dans le contrôleur:', req.body);
+
   // On extrait les données
   const {
     title,
     description,
-    pos,
+    pos, // Peut être undefined
     due_date,
     planned,
     reel,
@@ -23,7 +28,7 @@ const create = async (req, res) => {
   } = req.body;
   const userId = req.user.id;
   try {
-    // On vérifie si elles sont présentes
+    // On vérifie si les données essentielles sont présentes
     if (!title || !col_id || !project_id) {
       return res.status(400).json({
         message:
@@ -40,11 +45,11 @@ const create = async (req, res) => {
       });
     }
 
-    // Appel du modèle
+    // Appel du modèle avec une valeur par défaut pour la position
     const result = await createTask({
       task_title: title,
       task_desc: description,
-      task_pos: pos,
+      task_pos: pos || 0, // Si pos est undefined, on utilise 0
       task_due_date: due_date,
       planned_time: planned,
       reel_time: reel,
@@ -58,7 +63,7 @@ const create = async (req, res) => {
         task: {
           title,
           description,
-          pos,
+          pos: pos || 0,
           due_date,
           planned,
           reel,
@@ -118,6 +123,33 @@ const getByID = async (req, res) => {
   }
 };
 
+// Récupérer les tâches par ID de projet
+const getByProjectId = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const projectId = parseInt(id);
+
+    // 1. Vérifier si le projet existe
+    const project = await getProjectById(projectId);
+    if (!project) {
+      return res.status(404).json({ message: `Projet non trouvé avec l'ID ${projectId}` });
+    }
+
+    // 2. Si le projet existe, récupérer les tâches
+    const tasks = await getTasksByProjectId(projectId);
+    res.json({
+      message: `Tâches du projet ${projectId} récupérées avec succès`,
+      count: tasks.length,
+      tasks,
+    });
+  } catch (error) {
+    console.error("Erreur de récupération des tâches du projet", error.message);
+    res.status(500).json({
+      message: "Erreur de récupération des tâches du projet",
+    });
+  }
+};
+
 // Mettre à jour le statut d'une tâche
 const updateTaskStatus = async (req, res) => {
   try {
@@ -144,4 +176,4 @@ const updateTaskStatus = async (req, res) => {
   }
 };
 
-module.exports = { getAll, getByID, create, updateTaskStatus };
+module.exports = { getAll, getByID, create, updateTaskStatus, getByProjectId };

@@ -1,4 +1,5 @@
 const projectModel = require("../Models/Project");
+const taskModel = require("../Models/Task"); // Importer le modèle de tâche
 
 // Récupère tous les projets
 const getProjects = async (req, res) => {
@@ -30,10 +31,25 @@ const getProjectById = async (req, res) => {
   }
 };
 
+// Récupère toutes les tâches d'un projet
+const getProjectTasks = async (req, res) => {
+  try {
+    const { id_project } = req.params;
+    const tasks = await taskModel.getTasksByProjectId(id_project);
+    res.status(200).json(tasks);
+  } catch (error) {
+    console.error("ERREUR DANS GETPROJECTTASKS:", error.message);
+    res
+      .status(500)
+      .json({ message: "Erreur serveur lors de la récupération des tâches du projet." });
+  }
+};
+
 // Crée un nouveau projet
 const createProject = async (req, res) => {
   try {
     const { project_name, project_desc } = req.body;
+    const userId = req.user.id; // Récupérer l'ID de l'utilisateur depuis le token
 
     if (!project_name) {
       return res
@@ -41,9 +57,11 @@ const createProject = async (req, res) => {
         .json({ message: "Le champ 'project_name' est requis." });
     }
 
+    // Passer l'ID de l'utilisateur au modèle
     const projectId = await projectModel.createProject(
       project_name,
       project_desc,
+      userId,
     );
     res
       .status(201)
@@ -103,4 +121,5 @@ module.exports = {
   createProject,
   updateProject,
   deleteProject,
+  getProjectTasks, // Exporter la nouvelle fonction
 };

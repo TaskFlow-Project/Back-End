@@ -3,23 +3,24 @@ const db = require("../db");
 
 // fonction pour créer une tâche
 const createTask = async (taskData) => {
+  // On déstructure directement les noms de colonnes attendus par la BDD
   const {
-    title,
-    description,
-    pos,
-    due_date,
-    planned,
-    reel,
-    col_id,
-    project_id,
+    task_title,
+    task_desc,
+    task_pos,
+    task_due_date,
+    planned_time,
+    reel_time,
+    id_col,
+    id_project,
   } = taskData;
 
   const [result] = await db.query(
     "INSERT INTO taches (task_title, task_desc, task_pos, task_due_date, planned_time, reel_time, id_col, id_project) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
-    [title, description, pos, due_date, planned, reel, col_id, project_id],
+    [task_title, task_desc, task_pos, task_due_date, planned_time, reel_time, id_col, id_project],
   );
 
-  return result; // On retourne l'objet de la tâche qui vient d'être créée
+  return result;
 };
 
 // fonction qui permet de mettre à jour une tâche
@@ -73,6 +74,12 @@ const getTaskByID = async (id) => {
   return result;
 };
 
+// Récupérer toutes les tâches d'un projet spécifique
+const getTasksByProjectId = async (projectId) => {
+  const [rows] = await db.query("SELECT * FROM taches WHERE id_project = ?", [projectId]);
+  return rows;
+};
+
 // pour supprimer une tâche
 const delTask = async (id) => {
   const [result] = await db.query("DELETE FROM taches WHERE id_task = ?", [id]);
@@ -82,7 +89,7 @@ const delTask = async (id) => {
 // Mettre à jour uniquement le statut d'une tâche
 const updateTaskStatusInDB = async (taskId, status) => {
   // On recherche l'ID de la colonne qui correspond au statut
-  const [col] = await db.query("SELECT id_col FROM colonnes WHERE col_name = ?", [status]);
+  const [col] = await db.query("SELECT id_col FROM colonnes WHERE col_title = ?", [status]);
 
   if (col.length === 0) {
     throw new Error(`Le statut '${status}' ne correspond à aucune colonne.`);
@@ -103,4 +110,5 @@ module.exports = {
   updateTask,
   delTask,
   updateTaskStatusInDB,
+  getTasksByProjectId,
 };
