@@ -6,6 +6,8 @@ const cookieParser = require("cookie-parser");
 
 const authRoutes = require("./Endpoints/authRoutes");
 const taskRoutes = require("./Endpoints/taskRoutes");
+const projectRoutes = require("./Endpoints/projectRoutes");
+const columnRoutes = require("./Endpoints/columnRoutes");
 
 // Connx a la BDD
 const db = require("./db");
