@@ -30,7 +30,7 @@ const allowedOrigins = [process.env.FRONTEND_URL, "http://localhost:5173"];
 app.use(
   cors({
     origin: allowedOrigins, // Utilisation directe du tableau
-    methods: ["GET", "POST", "PUT", "DELETE"],
+    methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
     credentials: true,
     allowedHeaders: ["Content-Type", "Authorization"],
   }),
@@ -52,6 +52,7 @@ app.get("/health", (req, res) => {
 // Routes de l'API
 app.use("/api/users", authRoutes);
 app.use("/api/taches", taskRoutes);
+app.use("/api", projectRoutes); // Ajout de cette ligne
 
 // Gestion des erreurs
 
